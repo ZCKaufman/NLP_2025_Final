@@ -1,0 +1,56 @@
+### MODEL CONFIGURATION ###
+model:
+  name: "roberta-base"
+  
+  type: "auto"  # Use "auto" for non DistilBERT models, otherwise use "distilbert"
+
+### TASK CONFIGURATION ###
+tasks:
+  # Conspiracy Detection Baseline from StartP_README.md
+  binary_classification:
+    enabled: true
+    output_dir: "models/binary"  # Will be appended with model name
+    labels:
+      label_to_id:
+        "No": 0
+        "Yes": 1
+      id_to_label:
+        0: "No"
+        1: "Yes"
+    num_labels: 2
+  
+  # Conspiracy Marker Extraction Baseline from StartP_README.md
+  span_extraction:
+    enabled: true
+    output_dir_base: "models/span"  # Will be appended with model name and marker type
+    marker_types:
+      - "Action"
+      - "Actor"
+      - "Effect"
+      - "Evidence"
+      - "Victim"
+    max_sequence_length: 128
+
+### DATA PATHS ###
+data:
+  train_file: "train_rehydrated.jsonl"
+  dev_file: "dev_rehydrated.jsonl"
+  test_file: "dev_rehydrated.jsonl"  
+  submission_file: "submission.jsonl"
+
+### TRAINING HYPERPARAMETERS ###
+training:
+  batch_size: 16
+  eval_batch_size: 64
+  learning_rate: 2.0e-5
+  num_epochs: 10
+  weight_decay: 0.01
+  
+  optimizer: "adamw"
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1.0e-8
+
+  ### INFERENCE SETTINGS ###
+inference:
+  batch_size: 64
