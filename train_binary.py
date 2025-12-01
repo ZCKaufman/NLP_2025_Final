@@ -1,5 +1,6 @@
 import json
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification # Added for Roberta and other potential models
 from transformers import TrainingArguments, Trainer
 from datasets import Dataset
 import numpy as np
@@ -49,8 +50,8 @@ def save_predictions(trainer, test_dataset, output_file):
 
 if __name__ == "__main__":
     train_file = "train_rehydrated.jsonl"
-    model_name = "distilbert-base-uncased"
-    output_dir = "distilbert-conspiracy-classification"
+    model_name = "roberta-base"
+    output_dir = "roberta-base-conspiracy-classification"
     label_to_id = {"No": 0, "Yes": 1}
     id_to_label = {0: "No", 1: "Yes"}
     num_labels = len(label_to_id)
@@ -65,15 +66,18 @@ if __name__ == "__main__":
     train_dataset = Dataset.from_list(train_data)
 
     # Load tokenizer
-    tokenizer = DistilBertTokenizerFast.from_pretrained(model_name)
+    # tokenizer = DistilBertTokenizerFast.from_pretrained(model_name) # For DistilBERT
+    tokenizer = AutoTokenizer.from_pretrained(model_name) # For non DistilBERT models
 
     # Tokenize and encode labels
     tokenized_train_dataset = tokenize_data(train_dataset, tokenizer)
     encoded_train_dataset = encode_labels(tokenized_train_dataset, label_to_id)
 
     # Load the model
-    model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=num_labels, id2label=id_to_label,
-                                                                label2id=label_to_id)
+    #model = DistilBertForSequenceClassification.from_pretrained(model_name, num_labels=num_labels, id2label=id_to_label,
+    #                                                            label2id=label_to_id) # For DistilBERT
+    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels, id2label=id_to_label,
+                                                                label2id=label_to_id) # For non DistilBERT models
 
     # Define training arguments
     training_args = TrainingArguments(
