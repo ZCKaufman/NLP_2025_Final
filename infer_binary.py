@@ -11,14 +11,20 @@ from transformers import (
     Trainer,
     DataCollatorWithPadding,
 )
+
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+)
+
 from transformers import TrainingArguments
 
 # --- Configuration matching the training script ---
-MODEL_PATH = "distilbert-conspiracy-classification"
+MODEL_PATH = "roberta-base-conspiracy-classification"
 TEST_FILE = "dev_rehydrated.jsonl"
 SUBMISSION_FILE = "submission.jsonl"
-MODEL_NAME = "distilbert-base-uncased"
-LABEL_MAP = {0: "No", 1: "Yes"}
+MODEL_NAME = "roberta-base"
+#LABEL_MAP = {0: "No", 1: "Yes"} # Can keep with Distilbert
 BATCH_SIZE = 64
 
 
@@ -90,15 +96,22 @@ if __name__ == '__main__':
 
     print(f"Loading tokenizer from {MODEL_NAME} and trained model from {model_directory}...")
     try:
-        # Load the tokenizer.
-        tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_NAME)
+        # Load the tokenizer for DistilBERT models
+        #tokenizer = DistilBertTokenizerFast.from_pretrained(MODEL_NAME)
         # Load the model structure and weights from the discovered checkpoint directory.
-        model = DistilBertForSequenceClassification.from_pretrained(model_directory)
+        # model = DistilBertForSequenceClassification.from_pretrained(model_directory)
+
+        # For non DistilBERT models
+        tokenizer = AutoTokenizer.from_pretrained(model_directory)
+        model = AutoModelForSequenceClassification.from_pretrained(model_directory)
+
     except Exception as e:
         print(f"Error loading model or tokenizer using path: '{model_directory}'.")
         print("Please verify that the directory contains 'config.json' and 'model.safetensors' or 'pytorch_model.bin'.")
         print(f"Details: {e}")
         sys.exit(-1)
+
+    id2label = model.config.id2label
 
     # 3. Tokenize Data
     tokenized_test_dataset = tokenize_data(test_dataset, tokenizer)
@@ -127,8 +140,25 @@ if __name__ == '__main__':
     logits = predictions_output.predictions
     predicted_class_ids = np.argmax(logits, axis=-1)
 
-    # 6. Map IDs to Labels
-    predicted_labels = [LABEL_MAP[int(id)] for id in predicted_class_ids]
+    # 6. Map IDs to Labels with DistilBERT
+    #predicted_labels = [LABEL_MAP[int(id)] for id in predicted_class_ids]
+
+    # For non DistilBERT models
+    predicted_labels = []
+    for cls_id in predicted_class_ids:
+        # HF usually stores keys as ints, but be robust to strings
+        if isinstance(id2label, dict):
+            if cls_id in id2label:
+                label = id2label[cls_id]
+            elif str(cls_id) in id2label:
+                label = id2label[str(cls_id)]
+            else:
+                raise KeyError(f"Class id {cls_id} not in id2label mapping: {id2label}")
+        else:
+            # Fallback: id2label is a list
+            label = id2label[cls_id]
+        predicted_labels.append(label)
+
 
     # 7. Save Results in Codalab-ready JSONL format
     print(f"Saving {len(predicted_labels)} predictions to {SUBMISSION_FILE} (JSONL format)...")
