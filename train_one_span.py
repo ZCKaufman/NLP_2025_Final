@@ -1,7 +1,9 @@
 import json
 from transformers import DistilBertTokenizerFast, DistilBertForTokenClassification
+from transformers import AutoTokenizer, AutoModelForTokenClassification
 from transformers import TrainingArguments, Trainer, DataCollatorForTokenClassification
 from datasets import Dataset
+from config_loader import load_config
 
 
 def load_data(file_path):
@@ -22,14 +24,14 @@ def create_label_maps_simplified(marker_type):
     return label_to_id, id_to_label, len(label_list)
 
 
-def tokenize_and_align_labels_simplified(examples, tokenizer, label_to_id, marker_type):
-    tokenized_inputs = tokenizer(examples["text"], truncation=True, padding="max_length", max_length=128,
+def tokenize_and_align_labels_simplified(examples, tokenizer, label_to_id, marker_type, max_length):
+    tokenized_inputs = tokenizer(examples["text"], truncation=True, padding="max_length", max_length=max_length,
                                  return_offsets_mapping=True)
     labels = []
     all_markers = examples.get("markers", [])
 
     for i, offsets in enumerate(tokenized_inputs["offset_mapping"]):
-        example_labels = [0] * len(offsets)  # Initialize with 'O'
+        example_labels = [0] * len(offsets)
         example_markers = all_markers[i] if i < len(all_markers) else []
 
         for marker in example_markers:
@@ -43,7 +45,7 @@ def tokenize_and_align_labels_simplified(examples, tokenizer, label_to_id, marke
                             if start_char <= start < end_char:
                                 if token_idx < len(example_labels):
                                     example_labels[token_idx] = marker_label
-                            elif start < end_char and end > start_char:  # Handle partial overlaps
+                            elif start < end_char and end > start_char:
                                 if token_idx < len(example_labels) and example_labels[token_idx] == 0:
                                     example_labels[token_idx] = marker_label
         labels.append(example_labels)
@@ -52,49 +54,55 @@ def tokenize_and_align_labels_simplified(examples, tokenizer, label_to_id, marke
 
 
 if __name__ == "__main__":
-    train_file = "train_rehydrated.jsonl"
-    model_name = "distilbert-base-uncased"
-    output_dir_base = "distilbert-single-type-simplified"
-    batch_size = 16
-    learning_rate = 2e-5
-    num_epochs = 10
-    marker_types_to_train = ["Action", "Actor", "Effect", "Evidence", "Victim"]
-    all_results = {}
+    config = load_config()
 
     # Load data once
-    train_data = load_data(train_file)
+    train_data = load_data(config.train_file)
     train_dataset = Dataset.from_list(train_data)
 
-    tokenizer = DistilBertTokenizerFast.from_pretrained(model_name)
+    if config.model_type == "distilbert":
+        tokenizer = DistilBertTokenizerFast.from_pretrained(config.model_name)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
-    for marker_type in marker_types_to_train:
-        print(f"\n--- Training simplified model for marker type: {marker_type} ---")
+    for marker_type in config.marker_types:
+        print(f"\n{'='*60}")
+        print(f"Training model for marker type: {marker_type}")
+        print(f"{'='*60}")
 
-        # Create simplified label maps
         label_to_id, id_to_label, num_labels = create_label_maps_simplified(marker_type)
-        print("Label to ID mapping:", label_to_id)
-        print("ID to Label mapping:", id_to_label)
-        print("Number of labels:", num_labels)
+        print(f"Label mapping: {label_to_id}")
 
-        # Tokenize and align labels (simplified)
         tokenized_train_dataset = train_dataset.map(
             tokenize_and_align_labels_simplified,
             batched=True,
-            fn_kwargs={"tokenizer": tokenizer, "label_to_id": label_to_id, "marker_type": marker_type}
+            fn_kwargs={
+                "tokenizer": tokenizer,
+                "label_to_id": label_to_id,
+                "marker_type": marker_type,
+                "max_length": config.max_sequence_length
+            }
         )
 
-        # Load a new model for each marker type (now with 2 output labels)
-        model = DistilBertForTokenClassification.from_pretrained(model_name, num_labels=num_labels)
+        if config.model_type == "distilbert":
+            model = DistilBertForTokenClassification.from_pretrained(config.model_name, num_labels=num_labels)
+        else:
+            model = AutoModelForTokenClassification.from_pretrained(config.model_name, num_labels=num_labels)
 
-        # Define training arguments
-        output_dir = f"{output_dir_base}-{marker_type}"
+        output_dir = config.get_span_output_dir(marker_type)
+
         training_args = TrainingArguments(
             output_dir=output_dir,
-            learning_rate=learning_rate,
-            per_device_train_batch_size=batch_size,
-            num_train_epochs=num_epochs,
-            weight_decay=0.01,
-            logging_dir=f'./logs-{marker_type}-simplified',
+            learning_rate=config.learning_rate,
+            per_device_train_batch_size=config.batch_size,
+            num_train_epochs=config.num_epochs,
+            weight_decay=config.weight_decay,
+            save_strategy=config.save_strategy,
+            save_steps=config.save_steps,
+            save_total_limit=config.save_total_limit,
+            gradient_accumulation_steps=config.gradient_accumulation_steps,
+            warmup_ratio=config.warmup_ratio,
+            logging_dir=f'./logs-{marker_type}',
             report_to="none"
         )
 
@@ -108,7 +116,9 @@ if __name__ == "__main__":
             tokenizer=tokenizer,
         )
 
-        # Train
-        print(f"Training simplified model for {marker_type}...")
+        print(f"\nTraining model for {marker_type}...")
         trainer.train()
         print(f"Training for {marker_type} finished.")
+        
+        config.save_config_with_model(output_dir)
+        print(f"Config saved for {marker_type}")
