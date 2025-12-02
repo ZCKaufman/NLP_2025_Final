@@ -3,3 +3,4 @@ train_rehydrated.jsonl
 distilbert-conspiracy-classification
 roberta-base-conspiracy-classification
 .DS_Store
+__pycache__/

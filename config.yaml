@@ -40,7 +40,7 @@ data:
 
 ### TRAINING HYPERPARAMETERS ###
 training:
-  batch_size: 16
+  batch_size: 8
   eval_batch_size: 64
   learning_rate: 2.0e-5
   num_epochs: 10
