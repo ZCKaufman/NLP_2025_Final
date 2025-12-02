@@ -70,6 +70,26 @@ class Config:
         return self.get('training.weight_decay')
     
     @property
+    def save_strategy(self):
+        return self.get('training.save_strategy', 'epoch')
+    
+    @property
+    def save_steps(self):
+        return self.get('training.save_steps', 500)
+    
+    @property
+    def save_total_limit(self):
+        return self.get('training.save_total_limit', None)
+    
+    @property
+    def gradient_accumulation_steps(self):
+        return self.get('training.gradient_accumulation_steps', 1)
+    
+    @property
+    def warmup_ratio(self):
+        return self.get('training.warmup_ratio', 0.0)
+    
+    @property
     def label_to_id(self):
         return self.get('tasks.binary_classification.labels.label_to_id')
     
@@ -99,6 +119,18 @@ class Config:
     @property
     def max_sequence_length(self):
         return self.get('tasks.span_extraction.max_sequence_length')
+    
+    @property
+    def save_strategy(self):
+        return self.get('training.save_strategy', 'epoch')
+    
+    @property
+    def save_total_limit(self):
+        return self.get('training.save_total_limit', 2)
+    
+    @property
+    def save_steps(self):
+        return self.get('training.save_steps', 500)
     
     def save_config_with_model(self, output_dir):
         os.makedirs(output_dir, exist_ok=True)

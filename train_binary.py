@@ -5,8 +5,6 @@ from transformers import TrainingArguments, Trainer
 from datasets import Dataset
 from config_loader import load_config
 
-
-
 def load_and_filter_data(file_path):
     """Loads data from a JSON file and filters out entries with 'Can't tell'."""
     data = []
@@ -69,7 +67,6 @@ if __name__ == "__main__":
 
     output_dir = config.get_binary_output_dir()
 
-    # Define training arguments
     training_args = TrainingArguments(
         output_dir=output_dir,
         learning_rate=config.learning_rate,
@@ -77,9 +74,15 @@ if __name__ == "__main__":
         per_device_eval_batch_size=config.eval_batch_size,
         num_train_epochs=config.num_epochs,
         weight_decay=config.weight_decay,
+        save_strategy=config.save_strategy,
+        save_steps=config.save_steps,
+        save_total_limit=config.save_total_limit,
+        gradient_accumulation_steps=config.gradient_accumulation_steps,
+        warmup_ratio=config.warmup_ratio,
         logging_dir='./logs',
         report_to="none"
     )
+
     
     # Create Trainer instance
     trainer = Trainer(
