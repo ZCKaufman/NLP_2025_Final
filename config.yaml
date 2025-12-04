@@ -33,9 +33,9 @@ tasks:
 
 ### DATA PATHS ###
 data:
-  train_file: "train_rehydrated.jsonl"
-  dev_file: "dev_rehydrated.jsonl"
-  test_file: "dev_rehydrated.jsonl"  
+  train_file: "train_split.jsonl"
+  dev_file: "val_split.jsonl"  
+  test_file: "val_split.jsonl"  
   submission_file: "submission.jsonl"
 
 ### TRAINING HYPERPARAMETERS ###

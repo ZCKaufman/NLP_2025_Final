@@ -107,12 +107,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--reference-file",
         type=str,
-        default="test.jsonl",
+        default="val_split.jsonl",
         help="Path to the ground truth JSONL file (default: test.jsonl)."
     )
     parser.add_argument(
         "--submission-file",
-        default='submission.json',
+        default='submission.jsonl',
         type=str,
         help="Path to the submission JSONL file (e.g., submission.jsonl)."
     )

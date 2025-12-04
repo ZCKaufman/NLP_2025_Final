@@ -1,5 +1,7 @@
 train_redacted.jsonl
 train_rehydrated.jsonl
+train_split.jsonl
+val_split.jsonl
 distilbert-conspiracy-classification
 roberta-base-conspiracy-classification
 .DS_Store
