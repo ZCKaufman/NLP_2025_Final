@@ -1,8 +1,8 @@
 ### MODEL CONFIGURATION ###
 model:
-  name: "distilbert-base-uncased"
+  name: "electra-base-discriminator"
   
-  type: "DistilBERT"  # Use "auto" for non DistilBERT models, otherwise use "distilbert"
+  type: "auto"  # Use "auto" for non DistilBERT models, otherwise use "distilbert"
 
 ### TASK CONFIGURATION ###
 tasks:
