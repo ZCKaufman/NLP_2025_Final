@@ -1,62 +1,51 @@
-### MODEL CONFIGURATION ###
 model:
-  name: "google/electra-base-discriminator"
-  # Have used "roberta-base", "distilbert-base-uncased", "google/electra-base-discriminator"
-  type: "auto"  # Use "auto" for non DistilBERT models, otherwise use "distilbert"
-
-### TASK CONFIGURATION ###
+  name: roberta-base
+  type: auto
 tasks:
-  # Conspiracy Detection Baseline from StartP_README.md
   binary_classification:
     enabled: true
-    output_dir: "models/binary"  # Will be appended with model name
+    output_dir: models/binary
     labels:
       label_to_id:
-        "No": 0
-        "Yes": 1
+        'No': 0
+        'Yes': 1
       id_to_label:
-        0: "No"
-        1: "Yes"
+        0: 'No'
+        1: 'Yes'
     num_labels: 2
-  
-  # Conspiracy Marker Extraction Baseline from StartP_README.md
   span_extraction:
     enabled: true
-    output_dir_base: "models/span"  # Will be appended with model name and marker type
+    output_dir_base: models/span
     marker_types:
-      - "Action"
-      - "Actor"
-      - "Effect"
-      - "Evidence"
-      - "Victim"
+    - Action
+    - Actor
+    - Effect
+    - Evidence
+    - Victim
     max_sequence_length: 128
-
-### DATA PATHS ###
 data:
-  train_file: "train_split.jsonl"
-  dev_file: "val_split.jsonl"  
-  test_file: "val_split.jsonl"  
-  submission_file: "submission.jsonl"
-
-### TRAINING HYPERPARAMETERS ###
+  train_file: train_split.jsonl
+  dev_file: val_split.jsonl
+  test_file: val_split.jsonl
+  submission_file: submission.jsonl
 training:
-  batch_size: 4
-  gradient_accumulation_steps: 4
+  batch_size: 16
+  gradient_accumulation_steps: 2
   eval_batch_size: 64
-  learning_rate: 2.0e-5
+  learning_rate: 1.0e-05
   num_epochs: 15
-  weight_decay: 0.01
-  warmup_ratio: 0.1
-  
-  optimizer: "adamw"
+  weight_decay: 0.0
+  warmup_ratio: 0.0
+  optimizer: adamw
   adam_beta1: 0.9
   adam_beta2: 0.999
-  adam_epsilon: 1.0e-8
-
-  save_strategy: "epoch"  # "epoch" or "steps"
-  save_steps: 1000  # Only use if save_strategy is "steps"
-  save_total_limit: 1  # Keeps the most recent n checkpoints
-
-  ### INFERENCE SETTINGS ###
+  adam_epsilon: 1.0e-08
+  save_strategy: epoch
+  save_steps: 1000
+  save_total_limit: 2
 inference:
   batch_size: 64
+dataloader_num_workers: 4
+dataloader_pin_memory: true
+bf16: true
+fp16: false

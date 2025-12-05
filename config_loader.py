@@ -132,6 +132,22 @@ class Config:
     def save_steps(self):
         return self.get('training.save_steps', 500)
     
+    @property
+    def bf16(self):
+        return self.get('advanced.bf16', False)
+    
+    @property
+    def fp16(self):
+        return self.get('advanced.fp16', False)
+    
+    @property
+    def dataloader_num_workers(self):
+        return self.get('advanced.dataloader_num_workers', 0)
+    
+    @property
+    def dataloader_pin_memory(self):
+        return self.get('advanced.dataloader_pin_memory', True)
+    
     def save_config_with_model(self, output_dir):
         os.makedirs(output_dir, exist_ok=True)
         config_save_path = os.path.join(output_dir, 'training_config.yaml')

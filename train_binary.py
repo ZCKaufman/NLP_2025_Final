@@ -1,9 +1,19 @@
 import json
+import os
+import torch
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import TrainingArguments, Trainer
 from datasets import Dataset
 from config_loader import load_config
+
+# Force single GPU usage for optimal performance
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# Optimize CUDA settings
+torch.backends.cudnn.benchmark = True
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+
 
 def load_and_filter_data(file_path):
     """Loads data from a JSON file and filters out entries with 'Can't tell'."""
@@ -80,7 +90,12 @@ if __name__ == "__main__":
         gradient_accumulation_steps=config.gradient_accumulation_steps,
         warmup_ratio=config.warmup_ratio,
         logging_dir='./logs',
-        report_to="none"
+        report_to="none",
+        # GPU optimizations from config
+        fp16=config.fp16,
+        bf16=config.bf16,
+        dataloader_num_workers=config.dataloader_num_workers,
+        dataloader_pin_memory=config.dataloader_pin_memory,
     )
 
     

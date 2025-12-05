@@ -7,3 +7,4 @@ roberta-base-conspiracy-classification
 .DS_Store
 __pycache__/
 models/
+experiments/configs/
