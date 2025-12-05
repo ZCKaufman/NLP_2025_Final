@@ -1,7 +1,7 @@
 ### MODEL CONFIGURATION ###
 model:
-  name: "electra-base-discriminator"
-  
+  name: "google/electra-base-discriminator"
+  # Have used "roberta-base", "distilbert-base-uncased", "google/electra-base-discriminator"
   type: "auto"  # Use "auto" for non DistilBERT models, otherwise use "distilbert"
 
 ### TASK CONFIGURATION ###
