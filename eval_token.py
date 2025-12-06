@@ -6,8 +6,8 @@ import re
 from typing import Dict, List, Set, Tuple
 
 # --- Configuration ---
-DEFAULT_TEST_FILE = "test.jsonl"
-DEFAULT_SUBMISSION_FILE = "submission_span.jsonl"
+DEFAULT_TEST_FILE = "val_split.jsonl"
+DEFAULT_SUBMISSION_FILE = "submission.jsonl"
 DEFAULT_SCORES_FILE = "scores.json"
 
 MARKER_TYPES = {"Action", "Actor", "Effect", "Evidence", "Victim"}

@@ -17,13 +17,13 @@ from collections import defaultdict
 from config_loader import load_config
 
 
-def find_latest_checkpoint(base_path, marker_type):
-    full_path = f"{base_path}-{marker_type}"
-    checkpoint_dirs = glob.glob(os.path.join(full_path, "checkpoint-*"))
+def find_latest_checkpoint(model_path):
+    """Finds the latest checkpoint directory, or returns the model path if no checkpoints exist."""
+    checkpoint_dirs = glob.glob(os.path.join(model_path, "checkpoint-*"))
 
     if not checkpoint_dirs:
-        print(f"Warning: No 'checkpoint-*' folder found. Assuming model files are in: {full_path}")
-        return full_path
+        print(f"Warning: No 'checkpoint-*' folder found. Assuming model files are in: {model_path}")
+        return model_path
 
     checkpoint_dirs.sort(key=lambda x: int(os.path.basename(x).split('-')[-1]))
 
@@ -142,6 +142,13 @@ def reconstruct_spans(predictions, tokenized_dataset, id_to_label):
 
 if __name__ == '__main__':
     config = load_config()
+    
+    print(f"Loading configuration...")
+    print(f"Model: {config.model_name}")
+    print(f"Model Type: {config.model_type}")
+    print(f"Test file: {config.test_file}")
+    print(f"Marker types: {config.marker_types}")
+    print(f"Submission file: {config.submission_file}")
 
     raw_data = load_data(config.test_file)
     if not raw_data:
@@ -171,7 +178,7 @@ if __name__ == '__main__':
     all_predicted_markers = defaultdict(list)
 
     for marker_type in config.marker_types:
-        model_directory = find_latest_checkpoint(config.get_span_output_dir(marker_type), marker_type)
+        model_directory = find_latest_checkpoint(config.get_span_output_dir(marker_type))
 
         print(f"\n{'='*60}")
         print(f"Running inference for marker type: {marker_type}")
@@ -185,9 +192,12 @@ if __name__ == '__main__':
                 model = AutoModelForTokenClassification.from_pretrained(model_directory)
 
             id_to_label = {0: "O", 1: marker_type}
+            print(f"✓ Model loaded successfully")
+            print(f"  Label mapping: {id_to_label}")
 
         except Exception as e:
-            print(f"Error loading model for {marker_type} from '{model_directory}'. Details: {e}")
+            print(f"✗ Error loading model for {marker_type} from '{model_directory}'")
+            print(f"  Details: {e}")
             continue
 
         data_collator = DataCollatorForTokenClassification(tokenizer)
@@ -203,11 +213,13 @@ if __name__ == '__main__':
             tokenizer=tokenizer
         )
 
+        print(f"Starting prediction for {marker_type}...")
         predictions_output = prediction_args.predict(tokenized_test_dataset)
 
         logits = predictions_output.predictions
         predicted_class_ids = np.argmax(logits, axis=2)
 
+        print(f"Reconstructing character spans for {marker_type}...")
         current_marker_map = reconstruct_spans(predicted_class_ids, tokenized_test_dataset, id_to_label)
 
         for i, markers in current_marker_map.items():
