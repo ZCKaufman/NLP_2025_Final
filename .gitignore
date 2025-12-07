@@ -8,3 +8,4 @@ roberta-base-conspiracy-classification
 __pycache__/
 models/
 experiments/configs/
+experiments_span/configs/

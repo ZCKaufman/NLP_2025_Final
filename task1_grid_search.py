@@ -311,7 +311,6 @@ if __name__ == "__main__":
     print("Span Extraction Grid Search for Hyperparameter Tuning")
     print("=====================================================")
     print("\nNote: This trains 5 models per experiment (Action, Actor, Effect, Evidence, Victim)")
-    print("Expect ~15-30 minutes per experiment depending on hyperparameters")
     
     runner = SpanGridSearchRunner()
     runner.run_grid_search()

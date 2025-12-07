@@ -1,6 +1,6 @@
 model:
-  name: distilbert-base-uncased # Have used "roberta-base", "distilbert-base-uncased", "google/electra-base-discriminator"
-  type: distilbert # Use "auto" for non DistilBERT models, otherwise use "distilbert"
+  name: roberta-base
+  type: auto
 tasks:
   binary_classification:
     enabled: true
