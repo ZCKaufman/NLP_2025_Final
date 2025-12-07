@@ -29,7 +29,7 @@ data:
   test_file: val_split.jsonl
   submission_file: submission.jsonl
 training:
-  batch_size: 32
+  batch_size: 16
   gradient_accumulation_steps: 2
   eval_batch_size: 64
   learning_rate: 5.0e-05
