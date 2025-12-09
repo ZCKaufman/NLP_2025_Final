@@ -1,21 +1,6 @@
 {
-    "F1_Aggregate_Token": 0.362753036437247,
-    "Precision_Aggregate_Token": 0.38073654390934847,
-    "Recall_Aggregate_Token": 0.3463917525773196,
-    "F1_Macro_Token": 0.35031665553174224,
-    "F1_Action_Token": 0.3094958968347011,
-    "Precision_Action_Token": 0.3062645011600928,
-    "Recall_Action_Token": 0.3127962085308057,
-    "F1_Actor_Token": 0.45117845117845123,
-    "Precision_Actor_Token": 0.4734982332155477,
-    "Recall_Actor_Token": 0.43086816720257237,
-    "F1_Effect_Token": 0.28527131782945736,
-    "Precision_Effect_Token": 0.2893081761006289,
-    "Recall_Effect_Token": 0.28134556574923547,
-    "F1_Evidence_Token": 0.2845849802371541,
-    "Precision_Evidence_Token": 0.3157894736842105,
-    "Recall_Evidence_Token": 0.2589928057553957,
-    "F1_Victim_Token": 0.4210526315789474,
-    "Precision_Victim_Token": 0.4864864864864865,
-    "Recall_Victim_Token": 0.3711340206185567
+    "f1_score_weighted": 0.7706364209199749,
+    "accuracy": 0.7739130434782608,
+    "f1_score_no": 0.8115942028985508,
+    "f1_score_yes": 0.717391304347826
 }

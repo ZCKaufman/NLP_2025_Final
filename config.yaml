@@ -1,6 +1,6 @@
 model:
-  name: google/electra-base-discriminator
-  type: auto
+  name: distilbert-base-uncased
+  type: distilbert
 tasks:
   binary_classification:
     enabled: true
@@ -34,7 +34,7 @@ training:
   eval_batch_size: 64
   learning_rate: 1.0e-05
   num_epochs: 10
-  weight_decay: 0.1
+  weight_decay: 0.01
   warmup_ratio: 0.1
   optimizer: adamw
   adam_beta1: 0.9
