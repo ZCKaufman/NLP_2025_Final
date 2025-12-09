@@ -1,5 +1,5 @@
 model:
-  name: roberta-base
+  name: google/electra-base-discriminator
   type: auto
 tasks:
   binary_classification:
@@ -29,7 +29,7 @@ data:
   test_file: val_split.jsonl
   submission_file: submission.jsonl
 training:
-  batch_size: 16
+  batch_size: 32
   gradient_accumulation_steps: 2
   eval_batch_size: 64
   learning_rate: 5.0e-05

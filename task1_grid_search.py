@@ -31,9 +31,9 @@ class SpanGridSearchRunner:
         # Optimized for Fedora desktop with 96GB RAM and 2x RTX 4070 Ti Super
         # Smaller grid than binary due to 5x longer training time
         grid = {
-            'warmup_ratio': [0.0, 0.1],
-            'weight_decay': [0.0, 0.01, 0.1],
-            'gradient_accumulation_steps': [1, 2]
+            'learning_rate': [1e-5, 2e-5, 3e-5, 5e-5],
+            'batch_size': [16, 32],
+            'num_epochs': [10, 15],
         }
         return grid
     
