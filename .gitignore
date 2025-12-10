@@ -9,3 +9,5 @@ __pycache__/
 models/
 experiments/configs/
 experiments_span/configs/
+erroranalysis/span_models
+erroranalysis/model-conspiracy-classification
