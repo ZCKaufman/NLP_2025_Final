@@ -28,12 +28,12 @@ class GridSearchRunner:
     def define_hyperparameter_grid(self):
 
         grid = {
-            'learning_rate': [1e-5, 2e-5, 3e-5, 5e-5],
-            'batch_size': [16, 32],
-            'num_epochs': [10, 15],
-            # 'warmup_ratio': [0.0, 0.1],
-            # 'weight_decay': [0.0, 0.01, 0.1],
-            # 'gradient_accumulation_steps': [1, 2]
+            # 'learning_rate': [1e-5, 2e-5, 3e-5, 5e-5],
+            # 'batch_size': [16, 32],
+            # 'num_epochs': [10, 15],
+            'warmup_ratio': [0.0, 0.1],
+            'weight_decay': [0.0, 0.01, 0.1],
+            'gradient_accumulation_steps': [1, 2]
         }
         return grid
     
